@@ -11,6 +11,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { randomFrom, type Companion } from "@/lib/companions";
 import { useCompanion } from "@/lib/companion-context";
+import { SUPPORT } from "@/lib/character-prefs";
 import CompanionAvatar from "@/components/CompanionAvatar";
 import { useShouldFloat } from "@/components/AnimatedCompanion";
 import { lessonKey, loadLocalCompleted, markLessonComplete, retryPendingWhenOnline, syncCompleted } from "@/lib/progress";
@@ -175,6 +176,10 @@ const BONUS_PER_HEART = 8;
 
 const LessonPlayer = ({ lesson, islandName, islandId, companion, onBack, onComplete }: { lesson: CodeyLesson; islandName: string; islandId: number; companion: Companion; onBack: () => void; onComplete: () => void }) => {
   const { user } = useAuth();
+  // Estilo de apoio escolhido no criador de personagem
+  const { support } = useCompanion();
+  const calmMode = support === SUPPORT.calmo; // sem corações: errar não tira nada
+  const softHints = support === SUPPORT.dicas; // no erro, a dica aparece sozinha
   const [attemptKey, setAttemptKey] = useState(0);
   const [index, setIndex] = useState(0);
   const [feedback, setFeedback] = useState<{ ok: boolean; text: string } | null>(null);
@@ -218,11 +223,13 @@ const LessonPlayer = ({ lesson, islandName, islandId, companion, onBack, onCompl
     // companheiro animado: feliz no acerto; no erro, reação acolhedora (tontinho só no 2º erro seguido)
     reactCompanion(ok ? "acerto" : wrongStreak.current >= 1 ? "erro-seguido" : "erro");
     wrongStreak.current = ok ? 0 : wrongStreak.current + 1;
-    setFeedback({ ok, text });
+    const hint = (exercise as { hint?: string }).hint;
+    const withHint = !ok && softHints && hint && !text.includes(hint) ? `${text}\n\n💡 Dica: ${hint}` : text;
+    setFeedback({ ok, text: withHint });
     if (ok) {
       setPoints((p) => p + POINTS_PER_CORRECT);
       setCorrectCount((c) => c + 1);
-    } else {
+    } else if (!calmMode) {
       setHearts((value) => Math.max(0, value - 1));
     }
     setReaction({
@@ -312,8 +319,8 @@ const LessonPlayer = ({ lesson, islandName, islandId, companion, onBack, onCompl
                 <p className="font-display text-2xl font-bold text-foreground">{points}</p>
               </div>
               <div className="rounded-2xl bg-codey-coral/10 border border-codey-coral/20 p-3">
-                <p className="font-display text-xs text-codey-coral">Vidas</p>
-                <p className="font-display text-2xl font-bold text-foreground">{hearts}/5</p>
+                <p className="font-display text-xs text-codey-coral">{calmMode ? "Ritmo" : "Vidas"}</p>
+                <p className="font-display text-2xl font-bold text-foreground">{calmMode ? "🌿 calmo" : `${hearts}/5`}</p>
               </div>
               <div className="rounded-2xl bg-codey-turquoise/10 border border-codey-turquoise/20 p-3">
                 <p className="font-display text-xs text-codey-turquoise">Acertos</p>
@@ -361,9 +368,15 @@ const LessonPlayer = ({ lesson, islandName, islandId, companion, onBack, onCompl
         <div className="hidden sm:flex items-center gap-1 px-2 py-1 rounded-full bg-primary/10 text-primary font-display text-sm font-semibold" aria-label={`${points} pontos`}>
           <Sparkles className="w-4 h-4" /> {points}
         </div>
-        <div className="flex gap-1 text-codey-coral" aria-label={`${hearts} vidas restantes`}>
-          {Array.from({ length: 5 }).map((_, i) => <Heart key={i} className={`w-4 h-4 sm:w-5 sm:h-5 ${i < hearts ? "fill-current" : "opacity-25"}`} />)}
-        </div>
+        {calmMode ? (
+          <div className="flex items-center gap-1 px-2 py-1 rounded-full bg-codey-moss/15 text-codey-moss font-display text-xs sm:text-sm font-semibold" title="Modo calmo: errar não tira nada">
+            🌿 <span className="hidden sm:inline">Modo calmo</span>
+          </div>
+        ) : (
+          <div className="flex gap-1 text-codey-coral" aria-label={`${hearts} vidas restantes`}>
+            {Array.from({ length: 5 }).map((_, i) => <Heart key={i} className={`w-4 h-4 sm:w-5 sm:h-5 ${i < hearts ? "fill-current" : "opacity-25"}`} />)}
+          </div>
+        )}
       </header>
 
       <section className="flex-1 max-w-3xl w-full mx-auto px-3 sm:px-4 py-6 sm:py-8 md:py-10 pb-36 md:pb-44">
@@ -591,7 +604,7 @@ const ExerciseView = ({ exercise, onAnswer, feedback, onContinue, companion }: {
             {feedback.ok ? <Check className="w-5 h-5 text-codey-moss mt-0.5" /> : <Lightbulb className="w-5 h-5 text-codey-coral mt-0.5" />}
             <div className="flex-1">
               <p className="font-display font-semibold text-foreground">{feedback.ok ? "Boa!" : "Quase. Vamos com calma."}</p>
-              <p className="font-body text-sm text-muted-foreground">{feedback.text}</p>
+              <p className="font-body text-sm text-muted-foreground whitespace-pre-line">{feedback.text}</p>
             </div>
           </div>
           <Button variant="hero" className="mt-4" onClick={onContinue}>

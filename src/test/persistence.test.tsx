@@ -192,3 +192,56 @@ describe("som", () => {
     }).not.toThrow();
   });
 });
+
+// ---------------------------------------------------------------- aura e estilo de apoio
+import { AURAS, SUPPORT_STYLES, auraGradient } from "@/lib/character-prefs";
+
+const PrefsProbe = () => {
+  const { aura, support, status } = useCompanion();
+  return (
+    <div>
+      <span data-testid="aura">{aura}</span>
+      <span data-testid="support">{String(support)}</span>
+      <span data-testid="pstatus">{status}</span>
+    </div>
+  );
+};
+
+describe("aura e estilo de apoio", () => {
+  it("vêm do servidor e ficam em cache por usuário", async () => {
+    server.characters.set("ana", { data: { accessory: 1, outfit_color: 4, ability: 3 }, error: null });
+    currentUser = user("ana");
+    render(<CompanionProvider><PrefsProbe /></CompanionProvider>);
+    await waitFor(() => expect(screen.getByTestId("pstatus").textContent).toBe("ready"));
+    expect(screen.getByTestId("aura").textContent).toBe("4");
+    expect(screen.getByTestId("support").textContent).toBe("3");
+    expect(JSON.parse(localStorage.getItem("codey_prefs:v1:ana")!)).toEqual({ aura: 4, support: 3 });
+  });
+
+  it("usa o cache na hora, antes do servidor responder", () => {
+    localStorage.setItem("codey_prefs:v1:ana", JSON.stringify({ aura: 2, support: 0 }));
+    server.characters.set("ana", new Promise(() => {}));
+    currentUser = user("ana");
+    render(<CompanionProvider><PrefsProbe /></CompanionProvider>);
+    expect(screen.getByTestId("aura").textContent).toBe("2");
+    expect(screen.getByTestId("support").textContent).toBe("0");
+  });
+
+  it("valores inválidos no banco viram padrão seguro", async () => {
+    server.characters.set("ana", { data: { accessory: 0, outfit_color: 99, ability: -1 }, error: null });
+    currentUser = user("ana");
+    render(<CompanionProvider><PrefsProbe /></CompanionProvider>);
+    await waitFor(() => expect(screen.getByTestId("pstatus").textContent).toBe("ready"));
+    expect(screen.getByTestId("aura").textContent).toBe("0");
+    expect(screen.getByTestId("support").textContent).toBe("null");
+  });
+
+  it("cada aura gera o brilho com a própria cor", () => {
+    AURAS.forEach((a, i) => expect(auraGradient(i)).toContain(a.cssVar));
+    expect(auraGradient(99)).toContain(AURAS[0].cssVar);
+  });
+
+  it("só aparecem na escolha os estilos que o jogo cumpre", () => {
+    expect(SUPPORT_STYLES.filter((s) => s.visible).map((s) => s.name)).toEqual(["Dicas suaves", "Modo calmo"]);
+  });
+});

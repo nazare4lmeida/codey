@@ -10,38 +10,28 @@ import { useAuth } from "@/lib/auth-context";
 import { supabase } from "@/integrations/supabase/client";
 import { companionList as companions, preloadImage } from "@/lib/companions";
 import { useCompanion } from "@/lib/companion-context";
+import { AURAS, SUPPORT_STYLES } from "@/lib/character-prefs";
 import CompanionAvatar from "@/components/CompanionAvatar";
 import { useShouldFloat } from "@/components/AnimatedCompanion";
 import { sfx } from "@/lib/sound";
 import { toast } from "sonner";
 import forestImg from "@/assets/world-forest.jpg";
 
-const companionColors = [
-  { name: "Turquesa", className: "bg-codey-turquoise", value: 0 },
-  { name: "Âmbar", className: "bg-codey-amber", value: 1 },
-  { name: "Lavanda", className: "bg-codey-lavender", value: 2 },
-  { name: "Musgo", className: "bg-codey-moss", value: 3 },
-  { name: "Coral", className: "bg-codey-coral", value: 4 },
-  { name: "Céu", className: "bg-codey-sky", value: 5 },
-];
-
-const supportStyles = [
-  { icon: "💡", name: "Dicas suaves", desc: "Receber uma pista curta quando errar." },
-  { icon: "🧩", name: "Passo a passo", desc: "Quebrar o problema em partes menores." },
-  { icon: "🧪", name: "Testar primeiro", desc: "Ver exemplos antes de responder." },
-  { icon: "🌿", name: "Modo calmo", desc: "Mais tempo, menos pressão e feedback tranquilo." },
-];
+const companionColors = AURAS;
+// Só os estilos de apoio que o jogo realmente cumpre.
+const supportStyles = SUPPORT_STYLES.filter((s) => s.visible);
 
 const CharacterCreator = () => {
   const navigate = useNavigate();
   const { user, isLoading } = useAuth();
-  const { companionIndex, setCompanionIndex } = useCompanion();
+  const { companionIndex, setCompanionIndex, setCharacterPrefs, aura: savedAura, support: savedSupport } = useCompanion();
   const [name, setName] = useState("");
   // Começa JÁ com o companheiro salvo (cache por usuário), sem pular da Vix para o certo.
   const [companion, setCompanion] = useState(companionIndex ?? 0);
   const floats = useShouldFloat(companions[companion]);
-  const [color, setColor] = useState(0);
-  const [support, setSupport] = useState(0);
+  const [color, setColor] = useState(savedAura);
+  // estilo salvo que não aparece mais na lista (ainda sem conteúdo) começa em "Dicas suaves"
+  const [support, setSupport] = useState(savedSupport != null && supportStyles.some((s) => s.id === savedSupport) ? savedSupport : 0);
   const [step, setStep] = useState(0);
   const [saving, setSaving] = useState(false);
   const [loaded, setLoaded] = useState(false);
@@ -72,7 +62,7 @@ const CharacterCreator = () => {
         if (!t.name) setName(data.name || "");
         if (!t.companion && data.accessory >= 0 && data.accessory < companions.length) setCompanion(data.accessory);
         if (!t.color) setColor(data.outfit_color ?? 0);
-        if (!t.support) setSupport(data.ability ?? 0);
+        if (!t.support) setSupport(supportStyles.some((s) => s.id === data.ability) ? data.ability : 0);
       });
     return () => {
       cancelled = true;
@@ -105,12 +95,13 @@ const CharacterCreator = () => {
       return;
     }
     setCompanionIndex(companion);
+    setCharacterPrefs({ aura: color, support });
     sfx.complete();
     toast.success("Seu companheiro Codey está pronto! 💡");
     navigate("/hub");
   };
 
-  const steps = ["Nome", "Companheiro", "Cor", "Apoio"];
+  const steps = ["Nome", "Companheiro", "Aura", "Apoio"];
 
   return (
     <div className="min-h-screen bg-background relative overflow-x-hidden">
@@ -132,11 +123,11 @@ const CharacterCreator = () => {
         >
           <div className="text-center mb-6">
             <motion.div
-              className="mx-auto mb-4 w-32 h-32 rounded-full bg-primary/10 border-4 border-border flex items-center justify-center relative overflow-hidden"
+              className="mx-auto mb-4 w-32 h-32 rounded-full bg-card border-4 border-border flex items-center justify-center relative overflow-hidden"
               animate={floats ? { y: [0, -8, 0] } : { y: 0 }}
               transition={{ duration: 3.5, repeat: Infinity }}
             >
-              <CompanionAvatar companion={companions[companion]} className="w-full h-full" />
+              <CompanionAvatar companion={companions[companion]} aura={color} className="w-full h-full" />
             </motion.div>
             <h1 className="text-3xl md:text-4xl font-display font-bold text-foreground mb-2">
               Escolha quem acompanha você
@@ -198,6 +189,10 @@ const CharacterCreator = () => {
             )}
 
             {step === 2 && (
+              <>
+              <p className="font-body text-sm text-muted-foreground text-center mb-3">
+                A aura é o brilho que fica em volta do seu companheiro em todo o jogo. Veja lá em cima!
+              </p>
               <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
                 {companionColors.map((item, index) => (
                   <button
@@ -210,25 +205,27 @@ const CharacterCreator = () => {
                     }}
                     className={`rounded-2xl border p-4 transition ${color === index ? "border-primary shadow-md scale-[1.02]" : "border-border bg-background hover:border-primary/50"}`}
                   >
-                    <div className={`w-14 h-14 rounded-full mx-auto mb-2 ${item.className}`} />
+                    <div className={`w-14 h-14 rounded-full mx-auto mb-2 ${item.swatch}`} />
                     <span className="font-display text-sm text-foreground">{item.name}</span>
                   </button>
                 ))}
               </div>
+              </>
             )}
 
             {step === 3 && (
               <div className="grid sm:grid-cols-2 gap-3">
-                {supportStyles.map((item, index) => (
+                {supportStyles.map((item) => (
                   <button
                     key={item.name}
                     type="button"
+                    aria-pressed={support === item.id}
                     onClick={() => {
                       touched.current.support = true;
-                      setSupport(index);
+                      setSupport(item.id);
                       sfx.tap();
                     }}
-                    className={`rounded-2xl border p-4 text-left transition ${support === index ? "border-primary bg-primary/10 shadow-sm" : "border-border bg-background hover:border-primary/50"}`}
+                    className={`rounded-2xl border p-4 text-left transition ${support === item.id ? "border-primary bg-primary/10 shadow-sm" : "border-border bg-background hover:border-primary/50"}`}
                   >
                     <span className="text-3xl" aria-hidden="true">{item.icon}</span>
                     <h2 className="font-display font-bold text-foreground mt-2">{item.name}</h2>

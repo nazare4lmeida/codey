@@ -3,6 +3,7 @@ import { cn } from "@/lib/utils";
 import { useCompanion } from "@/lib/companion-context";
 import type { Companion } from "@/lib/companions";
 import AnimatedCompanion, { hasAnimation } from "@/components/AnimatedCompanion";
+import { auraGradient } from "@/lib/character-prefs";
 
 /**
  * Mostra o companheiro sem "piscar" outro personagem enquanto carrega.
@@ -14,19 +15,40 @@ export const CompanionAvatar = ({
   className,
   alt,
   animated = true,
+  aura: auraOverride,
+  showAura = true,
 }: {
   companion?: Companion;
   className?: string;
   alt?: string;
   /** false = sempre a imagem estática (ex.: listas/miniaturas) */
   animated?: boolean;
+  /** aura a mostrar (o criador passa a cor que está sendo escolhida); padrão: a salva */
+  aura?: number;
+  showAura?: boolean;
 }) => {
-  const { companion: fromCtx, isResolved } = useCompanion();
+  const { companion: fromCtx, isResolved, aura: savedAura } = useCompanion();
   const companion = override ?? fromCtx;
-  if (animated && (override || isResolved) && hasAnimation(companion)) {
-    return <AnimatedCompanion companion={companion} className={className} alt={alt} />;
-  }
-  return <StaticAvatar companion={companion} className={className} alt={alt} resolved={!!override || isResolved} />;
+  const resolved = !!override || isResolved;
+  const inner =
+    animated && resolved && hasAnimation(companion) ? (
+      <AnimatedCompanion companion={companion} className="relative w-full h-full" alt={alt} />
+    ) : (
+      <StaticAvatar companion={companion} className="relative w-full h-full" alt={alt} resolved={resolved} />
+    );
+  return (
+    <span className={cn("relative inline-block", className)}>
+      {showAura && resolved && (
+        // Aura: a cor escolhida no criador de personagem, como um brilho suave atrás do companheiro.
+        <span
+          aria-hidden
+          className="absolute -inset-[10%] rounded-full pointer-events-none transition-[background] duration-500"
+          style={{ background: auraGradient(auraOverride ?? savedAura) }}
+        />
+      )}
+      {inner}
+    </span>
+  );
 };
 
 const StaticAvatar = ({

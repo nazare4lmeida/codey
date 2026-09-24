@@ -70,3 +70,16 @@ Detalhes:
   movimento): o companheiro fica na pose parada, sem reagir.
 - Para acrescentar uma emoção nova: salvar a folha em `src/assets/anim/` e registrar em `ANIMATIONS`.
   Os testes em `src/test/animations.test.ts` conferem se toda emoção registrada tem a sua folha.
+
+## 6. Aura, estilo de apoio e cadastro
+
+- **Aura** (antes "Cor", que era salva mas não mudava nada): brilho suave da cor escolhida atrás
+  do companheiro em todas as telas. Aparece na hora na prévia do criador. `src/lib/character-prefs.ts`.
+- **Estilo de apoio** (também era salvo sem efeito). Agora só aparecem os que o jogo cumpre:
+  - Dicas suaves: ao errar, a dica do exercício aparece sozinha junto da explicação.
+  - Modo calmo: sem corações; errar não tira nada.
+  - "Passo a passo" e "Testar primeiro" ficam ocultos (índices 1 e 2 preservados) até existir conteúdo para eles.
+- **Cadastro**: funciona com a confirmação de e-mail ligada ou desligada no Supabase; erros do Supabase
+  traduzidos (ex.: "email rate limit exceeded").
+- **Edge Function admin-users**: sem dependência do esm.sh e com CORS definido na própria função.
+  Precisa ser publicada no projeto Supabase: `npx supabase functions deploy admin-users`.

@@ -34,7 +34,11 @@ const Login = () => {
           return;
         }
         const result = await signup(name, email, password);
-        if (result.ok) {
+        if (result.ok && result.needsConfirmation) {
+          // Sem sessão ainda: ir para /character agora só mandaria de volta ao login.
+          toast.info("Conta criada! Abra o e-mail que enviamos e clique no link para entrar. 💌", { duration: 8000 });
+          setIsSignup(false);
+        } else if (result.ok) {
           toast.success("Bem-vindo ao Codey, programador! 💡");
           navigate("/character");
         } else {

@@ -8,11 +8,24 @@ interface User {
   name: string;
 }
 
+/** Mensagens do Supabase Auth traduzidas e explicadas (as originais vêm em inglês técnico). */
+export const friendlyAuthError = (message: string): string => {
+  const m = message.toLowerCase();
+  if (m.includes("rate limit")) return "Muitas tentativas em pouco tempo. Espere alguns minutos e tente de novo.";
+  if (m.includes("already registered") || m.includes("already been registered")) return "Esse e-mail já tem conta. Tente entrar.";
+  if (m.includes("invalid login credentials")) return "E-mail ou senha incorretos.";
+  if (m.includes("email not confirmed")) return "Falta confirmar o e-mail. Abra a mensagem que enviamos e clique no link.";
+  if (m.includes("password should be at least")) return "A senha precisa ter pelo menos 6 caracteres.";
+  if (m.includes("invalid") && m.includes("email")) return "Esse e-mail não parece válido. Confira se digitou certinho.";
+  return message;
+};
+
 interface AuthContextType {
   user: User | null;
   isLoading: boolean;
   login: (email: string, password: string) => Promise<{ ok: boolean; error?: string }>;
-  signup: (name: string, email: string, password: string) => Promise<{ ok: boolean; error?: string }>;
+  /** needsConfirmation: o Supabase exige confirmar o e-mail antes de entrar (sem sessão ainda) */
+  signup: (name: string, email: string, password: string) => Promise<{ ok: boolean; error?: string; needsConfirmation?: boolean }>;
   logout: () => Promise<void>;
 }
 
@@ -63,12 +76,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const login = useCallback(async (email: string, password: string) => {
     const { error } = await supabase.auth.signInWithPassword({ email, password });
-    if (error) return { ok: false, error: error.message };
+    if (error) return { ok: false, error: friendlyAuthError(error.message) };
     return { ok: true };
   }, []);
 
   const signup = useCallback(async (name: string, email: string, password: string) => {
-    const { error } = await supabase.auth.signUp({
+    const { data, error } = await supabase.auth.signUp({
       email,
       password,
       options: {
@@ -76,8 +89,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         emailRedirectTo: window.location.origin,
       },
     });
-    if (error) return { ok: false, error: error.message };
-    return { ok: true };
+    if (error) return { ok: false, error: friendlyAuthError(error.message) };
+    // Com "Confirm email" DESLIGADO no Supabase, já vem uma sessão e a criança entra direto.
+    // Ligado, não há sessão até clicar no link do e-mail.
+    return { ok: true, needsConfirmation: !data.session };
   }, []);
 
   const logout = useCallback(async () => {
