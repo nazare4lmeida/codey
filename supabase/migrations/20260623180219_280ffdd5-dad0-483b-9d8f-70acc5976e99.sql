@@ -1,0 +1,3 @@
+COMMENT ON TABLE public.profiles IS E'@graphql({"totalCount": {"enabled": false}, "insert": {"enabled": false}, "update": {"enabled": false}, "delete": {"enabled": false}, "select": {"enabled": false}})';
+COMMENT ON TABLE public.characters IS E'@graphql({"totalCount": {"enabled": false}, "insert": {"enabled": false}, "update": {"enabled": false}, "delete": {"enabled": false}, "select": {"enabled": false}})';
+COMMENT ON TABLE public.game_progress IS E'@graphql({"totalCount": {"enabled": false}, "insert": {"enabled": false}, "update": {"enabled": false}, "delete": {"enabled": false}, "select": {"enabled": false}})';

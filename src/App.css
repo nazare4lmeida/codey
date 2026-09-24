@@ -1,0 +1,4 @@
+/* Reset Vite boilerplate — layout is handled by Tailwind on each page. */
+#root {
+  min-height: 100vh;
+}

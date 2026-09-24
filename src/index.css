@@ -1,0 +1,194 @@
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 40 30% 97%;
+    --foreground: 220 25% 20%;
+
+    --card: 40 25% 95%;
+    --card-foreground: 220 25% 20%;
+
+    --popover: 40 25% 95%;
+    --popover-foreground: 220 25% 20%;
+
+    --primary: 175 45% 45%;
+    --primary-foreground: 40 30% 97%;
+
+    --secondary: 270 30% 75%;
+    --secondary-foreground: 270 40% 20%;
+
+    --muted: 40 20% 90%;
+    --muted-foreground: 220 15% 50%;
+
+    --accent: 35 70% 60%;
+    --accent-foreground: 35 80% 15%;
+
+    --destructive: 0 55% 55%;
+    --destructive-foreground: 40 30% 97%;
+
+    --border: 40 20% 85%;
+    --input: 40 20% 88%;
+    --ring: 175 45% 45%;
+
+    --radius: 1rem;
+
+    /* Codey custom tokens */
+    --codey-turquoise: 175 45% 45%;
+    --codey-turquoise-soft: 175 35% 75%;
+    --codey-amber: 35 70% 60%;
+    --codey-amber-glow: 35 80% 70%;
+    --codey-lavender: 270 30% 75%;
+    --codey-lavender-deep: 270 35% 55%;
+    --codey-moss: 140 30% 45%;
+    --codey-moss-soft: 140 25% 70%;
+    --codey-coral: 15 60% 65%;
+    --codey-sky: 200 50% 70%;
+    --codey-cream: 40 30% 95%;
+    --codey-night: 220 30% 18%;
+        --code-bg: 220 30% 18%;
+    --code-fg: 40 30% 96%;
+
+    --gradient-hero: linear-gradient(135deg, hsl(175 45% 45% / 0.15), hsl(270 30% 75% / 0.15), hsl(35 70% 60% / 0.1));
+    --gradient-world: linear-gradient(180deg, hsl(200 50% 70% / 0.3), hsl(175 45% 45% / 0.1));
+    --gradient-warm: linear-gradient(135deg, hsl(35 70% 60% / 0.2), hsl(15 60% 65% / 0.15));
+
+    --shadow-soft: 0 4px 20px -4px hsl(220 25% 20% / 0.08);
+    --shadow-glow-turquoise: 0 0 30px -5px hsl(175 45% 45% / 0.25);
+    --shadow-glow-amber: 0 0 30px -5px hsl(35 70% 60% / 0.3);
+    --shadow-glow-lavender: 0 0 30px -5px hsl(270 30% 75% / 0.3);
+
+    --sidebar-background: 40 25% 95%;
+    --sidebar-foreground: 220 25% 20%;
+    --sidebar-primary: 175 45% 45%;
+    --sidebar-primary-foreground: 40 30% 97%;
+    --sidebar-accent: 270 30% 75%;
+    --sidebar-accent-foreground: 270 40% 20%;
+    --sidebar-border: 40 20% 85%;
+    --sidebar-ring: 175 45% 45%;
+  }
+
+  .dark {
+    /* Aquarela noturna: mesma paleta, apenas escurecida e dessaturada
+       para manter conforto sensorial (sem cores vibrantes). */
+    --background: 220 20% 12%;
+    --foreground: 40 15% 88%;
+
+    --card: 220 18% 16%;
+    --card-foreground: 40 15% 88%;
+
+    --popover: 220 18% 16%;
+    --popover-foreground: 40 15% 88%;
+
+    --primary: 175 30% 55%;
+    --primary-foreground: 220 20% 12%;
+
+    --secondary: 270 20% 55%;
+    --secondary-foreground: 40 15% 92%;
+
+    --muted: 220 12% 22%;
+    --muted-foreground: 40 10% 68%;
+
+    --accent: 35 40% 58%;
+    --accent-foreground: 220 20% 12%;
+
+    --destructive: 0 35% 50%;
+    --destructive-foreground: 40 15% 92%;
+
+    --border: 220 12% 24%;
+    --input: 220 12% 22%;
+    --ring: 175 30% 55%;
+
+    --codey-turquoise: 175 30% 55%;
+    --codey-turquoise-soft: 175 20% 40%;
+    --codey-amber: 35 40% 60%;
+    --codey-amber-glow: 35 45% 65%;
+    --codey-lavender: 270 20% 65%;
+    --codey-lavender-deep: 270 25% 72%;
+    --codey-moss: 140 22% 55%;
+    --codey-moss-soft: 140 15% 40%;
+    --codey-coral: 15 35% 60%;
+    --codey-sky: 200 25% 55%;
+    --codey-cream: 220 15% 20%;
+    --codey-night: 220 30% 8%;
+    --code-bg: 222 28% 13%;
+    --code-fg: 40 30% 93%;
+
+    --gradient-hero: linear-gradient(135deg, hsl(175 30% 55% / 0.12), hsl(270 20% 55% / 0.12), hsl(35 40% 55% / 0.08));
+    --gradient-world: linear-gradient(180deg, hsl(200 25% 35% / 0.3), hsl(175 30% 40% / 0.12));
+    --gradient-warm: linear-gradient(135deg, hsl(35 40% 55% / 0.18), hsl(15 35% 50% / 0.12));
+
+    --sidebar-background: 220 18% 14%;
+    --sidebar-foreground: 40 15% 88%;
+    --sidebar-primary: 175 30% 55%;
+    --sidebar-primary-foreground: 220 20% 12%;
+    --sidebar-accent: 270 20% 55%;
+    --sidebar-accent-foreground: 40 15% 92%;
+    --sidebar-border: 220 12% 24%;
+    --sidebar-ring: 175 30% 55%;
+  }
+
+
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground font-body antialiased;
+  }
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-display;
+  }
+}
+
+@layer utilities {
+  .codey-glow {
+    box-shadow: var(--shadow-glow-turquoise);
+  }
+  .codey-glow-amber {
+    box-shadow: var(--shadow-glow-amber);
+  }
+  .codey-glow-lavender {
+    box-shadow: var(--shadow-glow-lavender);
+  }
+  .codey-gradient-hero {
+    background: var(--gradient-hero);
+  }
+  .codey-gradient-world {
+    background: var(--gradient-world);
+  }
+  .codey-gradient-warm {
+    background: var(--gradient-warm);
+  }
+  .text-gradient-codey {
+    background: linear-gradient(135deg, hsl(175 45% 45%), hsl(270 30% 65%), hsl(35 70% 55%));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  .prose-codey pre {
+     background: hsl(var(--code-bg));
+    color: hsl(var(--code-fg));
+    border: 1px solid hsl(var(--border));
+    border-radius: 1rem;
+    padding: 1rem;
+    overflow-x: auto;
+    margin: 0.75rem 0;
+  }
+  .prose-codey code {
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+    background: hsl(var(--primary) / 0.1);
+    color: hsl(var(--foreground));
+    border-radius: 0.4rem;
+    padding: 0.1rem 0.35rem;
+  }
+  .prose-codey pre code {
+    background: transparent;
+    color: inherit;
+    padding: 0;
+  }
+}

@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Codey - Programando Aventuras</title>
+
+    <!-- Aplica o tema salvo ANTES do primeiro desenho da tela (evita piscar claro→escuro). -->
+    <script>
+      (function () {
+        try {
+          var t = localStorage.getItem("codey_theme");
+          if (t !== "light" && t !== "dark") t = window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+          if (t === "dark") document.documentElement.classList.add("dark");
+        } catch (e) {}
+      })();
+    </script>
+
+    <!-- Fontes: antes vinham por @import dentro do CSS (cadeia bloqueante CSS → CSS do Google → fonte).
+         Agora a conexão é aberta em paralelo, logo no início. -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Quicksand:wght@400;500;600;700&display=swap" />
+    <meta name="description" content="Aprenda programação web jogando!">
+    <meta name="author" content="Codey Games" />
+    
+    
+    <meta property="og:type" content="website" />
+
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta property="og:title" content="Codey - Programando Aventuras">
+  <meta name="twitter:title" content="Codey - Programando Aventuras">
+  <meta property="og:description" content="Aprenda programação web jogando!">
+  <meta name="twitter:description" content="Aprenda programação web jogando!">
+</head>
+
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>
