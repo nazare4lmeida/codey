@@ -48,7 +48,8 @@
     --codey-sky: 200 50% 70%;
     --codey-cream: 40 30% 95%;
     --codey-night: 220 30% 18%;
-        --code-bg: 220 30% 18%;
+    /* Blocos de código: cores próprias (não reaproveitar --primary-foreground, que inverte no tema escuro) */
+    --code-bg: 220 30% 18%;
     --code-fg: 40 30% 96%;
 
     --gradient-hero: linear-gradient(135deg, hsl(175 45% 45% / 0.15), hsl(270 30% 75% / 0.15), hsl(35 70% 60% / 0.1));
@@ -171,7 +172,7 @@
     background-clip: text;
   }
   .prose-codey pre {
-     background: hsl(var(--code-bg));
+    background: hsl(var(--code-bg));
     color: hsl(var(--code-fg));
     border: 1px solid hsl(var(--border));
     border-radius: 1rem;

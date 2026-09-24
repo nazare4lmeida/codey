@@ -8,6 +8,7 @@ import companionMusgo from "@/assets/companion-musgo.webp";
 import companionMarola from "@/assets/companion-marola.webp";
 import companionAstro from "@/assets/companion-astro.webp";
 import mascotImg from "@/assets/codey-mascot.webp";
+import lilyImg from "@/assets/companion-admin-lily.webp";
 
 export type Companion = {
   /** chave estável (usada nas animações: src/assets/anim/<id>-<emoção>.webp) */
@@ -82,6 +83,16 @@ export const companionList: Companion[] = [
 
 // Usado quando ainda não há companheiro escolhido (ou o índice salvo é inválido).
 export const fallbackCompanion: Companion = companionList[6];
+
+/** Companheira exclusiva do painel admin. Fica FORA de companionList: a criança não a escolhe. */
+export const adminCompanion: Companion = {
+  id: "lily",
+  img: lilyImg,
+  name: "Lily",
+  desc: "Fadinha das flores que cuida do jardim do Codey junto com você.",
+  celebrate: ["Tudo florescendo por aqui ✿"],
+  encourage: ["Calma, a gente arruma isso juntas."],
+};
 
 export const isValidCompanionIndex = (index: unknown): index is number =>
   typeof index === "number" && Number.isInteger(index) && index >= 0 && index < companionList.length;

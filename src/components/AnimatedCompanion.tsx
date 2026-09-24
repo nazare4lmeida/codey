@@ -48,10 +48,13 @@ export const AnimatedCompanion = ({
   companion,
   className,
   alt,
+  clickClips,
 }: {
   companion: Companion;
   className?: string;
   alt?: string;
+  /** Emoções que tocam ao clicar (alternando). Sem isso, o companheiro só reage aos eventos da lição. */
+  clickClips?: ClipName[];
 }) => {
   const anim = getAnimation(companion.id);
   const calm = useCalmMotion();
@@ -60,6 +63,7 @@ export const AnimatedCompanion = ({
   const state = useRef({ clip: "parado" as ClipName, frame: 0, last: 0 });
   const visible = useRef(true);
   const [ready, setReady] = useState(false);
+  const clickTurn = useRef(0);
 
   // Desenha um quadro da emoção atual.
   const draw = () => {
@@ -150,36 +154,63 @@ export const AnimatedCompanion = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [anim, ready, calm]);
 
+  // Toca uma emoção (baixa a folha na hora, se ainda não tiver chegado).
+  const playClip = (clip: ClipName) => {
+    if (!anim || calm || !anim[clip]) return;
+    const play = () => {
+      state.current = { clip, frame: 0, last: 0 };
+      draw();
+    };
+    if (sheets.current[clip]) return play();
+    const url = sheetUrl(companion.id, clip);
+    if (!url) return;
+    const asked = performance.now();
+    loadSheet(url)
+      .then((img) => {
+        sheets.current[clip] = img;
+        if (performance.now() - asked < 1500) play(); // se demorar demais, já perdeu o sentido
+      })
+      .catch(() => undefined);
+  };
+
   // Reage aos eventos da lição.
   useEffect(() => {
     if (!anim) return;
     return onCompanionReaction((r) => {
-      if (calm) return;
       const clip = pickClip(anim, r);
-      if (!clip) return;
-      const play = () => {
-        state.current = { clip, frame: 0, last: 0 };
-        draw();
-      };
-      if (sheets.current[clip]) return play();
-      // Ainda não baixou: toca assim que chegar, se for logo (senão já perdeu o sentido).
-      const url = sheetUrl(companion.id, clip);
-      if (!url) return;
-      const asked = performance.now();
-      loadSheet(url)
-        .then((img) => {
-          sheets.current[clip] = img;
-          if (performance.now() - asked < 1500) play();
-        })
-        .catch(() => undefined);
+      if (clip) playClip(clip);
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [anim, calm, companion.id]);
 
+  const onClick =
+    clickClips && clickClips.length
+      ? () => {
+          if (state.current.clip !== "parado") return; // deixa terminar a reação atual
+          playClip(clickClips[clickTurn.current++ % clickClips.length]);
+        }
+      : undefined;
+
   if (!anim) return null;
 
   return (
-    <span className={cn("relative inline-block", className)} role="img" aria-label={alt ?? companion.name}>
+    <span
+      className={cn("relative inline-block", onClick && !calm && "cursor-pointer", className)}
+      role={onClick ? "button" : "img"}
+      tabIndex={onClick ? 0 : undefined}
+      aria-label={alt ?? companion.name}
+      onClick={onClick}
+      onKeyDown={
+        onClick
+          ? (e) => {
+              if (e.key === "Enter" || e.key === " ") {
+                e.preventDefault();
+                onClick();
+              }
+            }
+          : undefined
+      }
+    >
       {!ready && (
         <img src={companion.img} alt="" aria-hidden decoding="async" draggable={false} className="absolute inset-0 w-full h-full object-contain" />
       )}

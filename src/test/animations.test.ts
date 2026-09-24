@@ -1,6 +1,6 @@
 import { describe, it, expect } from "vitest";
 import { ANIMATIONS, getAnimation, pickClip, sheetUrl, type ClipName } from "@/lib/companionAnimations";
-import { companionList } from "@/lib/companions";
+import { adminCompanion, companionList } from "@/lib/companions";
 import { onCompanionReaction, reactCompanion } from "@/lib/companion-reaction";
 
 describe("escolha da emoção", () => {
@@ -29,8 +29,8 @@ describe("escolha da emoção", () => {
 });
 
 describe("registro de animações", () => {
-  it("todo companheiro com animação existe no catálogo, e o Codey segue estático", () => {
-    const ids = companionList.map((c) => c.id);
+  it("todo companheiro com animação existe no catálogo (ou é a Lily do admin), e o Codey segue estático", () => {
+    const ids = [...companionList.map((c) => c.id), adminCompanion.id];
     Object.keys(ANIMATIONS).forEach((id) => expect(ids).toContain(id));
     expect(getAnimation("codey")).toBeNull();
   });
@@ -43,6 +43,27 @@ describe("registro de animações", () => {
   it("só o 'parado' fica em loop", () => {
     for (const anim of Object.values(ANIMATIONS))
       for (const [clip, meta] of Object.entries(anim)) expect(meta!.loop).toBe(clip === "parado");
+  });
+});
+
+describe("Lily (admin)", () => {
+  it("não aparece na escolha de companheiro da criança", () => {
+    expect(companionList.map((c) => c.id)).not.toContain("lily");
+  });
+
+  it("tem parado em loop e as emoções do clique", () => {
+    const lily = getAnimation("lily")!;
+    expect(lily.parado.loop).toBe(true);
+    expect(lily.pensando).toBeTruthy();
+    expect(lily.assustada).toBeTruthy();
+  });
+
+  it("nos eventos da lição, nunca usa triste nem assustada", () => {
+    const lily = getAnimation("lily")!;
+    for (const r of ["acerto", "erro", "erro-seguido", "fim"] as const) {
+      expect(pickClip(lily, r)).not.toBe("triste");
+      expect(pickClip(lily, r)).not.toBe("assustada");
+    }
   });
 });
 

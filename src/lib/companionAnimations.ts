@@ -8,7 +8,7 @@
  * Nada mais precisa mudar: o jogo passa a usar a emoção sozinho (ver pickClip).
  */
 
-export type ClipName = "parado" | "feliz" | "calminho" | "pensando" | "tonto" | "triste";
+export type ClipName = "parado" | "feliz" | "calminho" | "pensando" | "tonto" | "triste" | "assustada";
 
 export type ClipMeta = { frames: number; cols: number; size: number; fps: number; loop: boolean };
 
@@ -46,6 +46,14 @@ export const ANIMATIONS: Record<string, CompanionAnimation> = {
     feliz: { frames: 28, cols: 8, size: 200, fps: 12, loop: false },
     parado: { frames: 24, cols: 8, size: 200, fps: 12, loop: true },
     calminho: { frames: 18, cols: 8, size: 200, fps: 12, loop: false },
+  },
+  // Lily: companheira exclusiva do painel admin (não aparece na escolha da criança).
+  // parado = trecho "feliz" do vídeo em vai-e-volta; ao clicar alterna pensando/assustada; triste fica guardada.
+  lily: {
+    parado: { frames: 54, cols: 8, size: 200, fps: 12, loop: true },
+    pensando: { frames: 18, cols: 8, size: 200, fps: 12, loop: false },
+    assustada: { frames: 20, cols: 8, size: 200, fps: 12, loop: false },
+    triste: { frames: 56, cols: 8, size: 200, fps: 12, loop: false },
   },
 };
 

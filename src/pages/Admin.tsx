@@ -18,7 +18,8 @@ import { motion } from "framer-motion";
 import ThemeToggle from "@/components/ThemeToggle";
 import PasswordInput from "@/components/PasswordInput";
 import AuroraBackground from "@/components/AuroraBackground";
-import adminCompanion from "@/assets/companion-admin-lily.webp";
+import { adminCompanion } from "@/lib/companions";
+import AnimatedCompanion from "@/components/AnimatedCompanion";
 import { codeyIslands, codeyLessons } from "@/data/codeyContent";
 
 type AdminUser = {
@@ -134,20 +135,15 @@ const AdminPanel = ({ adminName, onLogout }: { adminName: string; onLogout: () =
         >
           <Card className="relative overflow-hidden p-5 sm:p-6 border-primary/20 bg-gradient-to-br from-primary/10 via-secondary/10 to-accent/10">
             <div className="flex flex-col sm:flex-row items-center gap-5">
-              <motion.div
-                animate={{ y: [0, -8, 0] }}
-                transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
-                className="relative flex-shrink-0"
-              >
+              <div className="relative flex-shrink-0" title="Toque na Lily ✿">
                 <div className="absolute inset-0 bg-secondary/40 blur-2xl rounded-full" />
-                <img
-                  src={adminCompanion}
+                <AnimatedCompanion
+                  companion={adminCompanion}
+                  clickClips={["pensando", "assustada"]}
                   alt="Lily, sua companheira admin"
-                  width={160}
-                  height={160}
-                  className="relative w-32 h-32 sm:w-40 sm:h-40 object-contain drop-shadow-lg"
+                  className="relative w-32 h-32 sm:w-40 sm:h-40 drop-shadow-lg"
                 />
-              </motion.div>
+              </div>
               <div className="flex-1 text-center sm:text-left space-y-2">
                 <div className="flex items-center justify-center sm:justify-start gap-2">
                   <Sparkles className="w-4 h-4 text-accent" />
