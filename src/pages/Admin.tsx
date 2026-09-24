@@ -501,7 +501,7 @@ const AttemptsTab = () => {
             <tbody>
               {rows.map(r => (
                 <tr key={r.id} className="border-b border-border/50 hover:bg-muted/30">
-                  <td className="py-2 pr-2">{names[r.user_id] || r.user_id.slice(0,6)}</td>
+                  <td className="py-2 pr-2">{names[r.user_id] || <span className="text-muted-foreground italic" title={r.user_id}>Sem nome ({r.user_id.slice(0, 6)})</span>}</td>
                   <td className="pr-2 text-muted-foreground">{r.island_id} / {r.lesson_id}</td>
                   <td className="pr-2 font-medium">{r.score}</td>
                   <td className="pr-2">{r.correct_count}/{r.total}</td>

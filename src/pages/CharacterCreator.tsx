@@ -96,6 +96,10 @@ const CharacterCreator = () => {
     }
     setCompanionIndex(companion);
     setCharacterPrefs({ aura: color, support });
+    // O nome escolhido aqui é o que aparece no ranking e no painel (nome da conta).
+    if (name.trim()) {
+      void supabase.from("profiles").update({ display_name: name.trim() }).eq("user_id", user.id);
+    }
     sfx.complete();
     toast.success("Seu companheiro Codey está pronto! 💡");
     navigate("/hub");

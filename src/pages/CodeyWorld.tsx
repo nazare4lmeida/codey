@@ -21,6 +21,7 @@ import { getIslandImage } from "@/lib/islandImages";
 import { isIslandUnlocked } from "@/lib/islandUnlock";
 import { BlockBuilder, BugHunt, MazeRunner, MemoryMatch, WireMatch } from "@/components/codey/InteractiveExercises";
 import { FillCode } from "@/components/codey/FillCode";
+import StyleMatch from "@/components/codey/StyleMatch";
 
 const escapeHtml = (text: string) =>
   text.replace(/[&<>"']/g, (char) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[char] || char);
@@ -579,6 +580,22 @@ const ExerciseView = ({ exercise, onAnswer, feedback, onContinue, companion }: {
           <p className="font-display text-sm text-primary font-semibold">{exercise.title}</p>
           <h2 className="font-display text-2xl font-bold text-foreground">{exercise.prompt}</h2>
           <BlockBuilder palette={exercise.palette} solution={exercise.solution} explanation={exercise.explanation} disabled={disabled} onAnswer={onAnswer} />
+        </>
+      )}
+
+      {exercise.type === "style_match" && (
+        <>
+          <p className="font-display text-sm text-primary font-semibold">{exercise.title}</p>
+          <h2 className="font-display text-2xl font-bold text-foreground">{exercise.prompt}</h2>
+          <StyleMatch
+            element={exercise.element}
+            label={exercise.label}
+            selector={exercise.selector}
+            props={exercise.props}
+            explanation={exercise.explanation}
+            disabled={disabled}
+            onAnswer={onAnswer}
+          />
         </>
       )}
 

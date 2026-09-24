@@ -1,3 +1,5 @@
+import { challengeLessons } from "@/data/codeyChallenges";
+
 export type Exercise =
   | { type: "info"; title: string; body: string }
   | {
@@ -88,6 +90,17 @@ export type Exercise =
       code: string; // use "___" para marcar cada lacuna, na ordem
       blanks: string[]; // respostas corretas na mesma ordem
       options: string[]; // blocos disponíveis (com distratores)
+      explanation: string;
+    }
+  | {
+      // Estilize igual ao modelo: escolhe valores de CSS e vê o elemento mudar na hora.
+      type: "style_match";
+      title: string;
+      prompt: string;
+      element: "button" | "card" | "text" | "badge";
+      label: string; // texto dentro do elemento
+      selector: string; // como aparece no CSS (ex.: ".botao")
+      props: { prop: string; label: string; options: string[]; answer: string }[];
       explanation: string;
     };
 
@@ -243,7 +256,7 @@ export const codeyLessons: Record<number, CodeyLesson[]> = {
   4: [
     { id: "4-1", title: "Pensando como um Algoritmo", xp: 20, exercises: [
       { type: "info", title: "O que é um algoritmo?", body: "Um **algoritmo** é uma sequência finita e ordenada de passos para resolver um problema." },
-      { type: "maze", title: "Guie seu companheiro até o tesouro", prompt: "Monte a sequência de passos que leva seu companheiro do ponto inicial até o tesouro, evitando as pedras.", cols: 4, rows: 4, start: [0, 3], goal: [3, 0], walls: [[1, 2], [2, 2], [2, 1]], solution: ["up", "up", "right", "up", "right", "right", "up"], explanation: "Algoritmo é exatamente isso: uma lista de instruções, na ordem certa, que leva ao objetivo." },
+      { type: "maze", title: "Guie seu companheiro até o tesouro", prompt: "Monte a sequência de passos que leva seu companheiro do ponto inicial até o tesouro, evitando as pedras.", cols: 4, rows: 4, start: [0, 3], goal: [3, 0], walls: [[1, 2], [2, 2], [2, 1]], solution: ["up", "up", "right", "up", "right", "right"], explanation: "Algoritmo é exatamente isso: uma lista de instruções, na ordem certa, que leva ao objetivo." },
       { type: "reorder", title: "Monte o algoritmo", prompt: "Coloque os passos de fazer um sanduíche na ordem correta:", items: ["Pegar duas fatias de pão", "Passar manteiga em uma fatia", "Colocar o recheio", "Fechar o sanduíche"], explanation: "A ordem dos passos muda o resultado." },
       { type: "multiple_choice", question: "Por que a ordem importa em um algoritmo?", options: ["Porque o resultado pode mudar", "Não importa", "Só importa em computadores antigos", "Só importa em jogos"], correctIndex: 0, notes: ["Certo — trocar passos pode quebrar o resultado.", "Errado — a ordem quase sempre importa.", "Errado — vale para qualquer computador.", "Errado — vale para muitas tarefas."] },
     ] },
@@ -305,7 +318,7 @@ export const codeyLessons: Record<number, CodeyLesson[]> = {
     ] },
     { id: "6-2", title: "Hooks: useState & useEffect", xp: 25, exercises: [
       { type: "info", title: "Memória e efeitos", body: "`useState` guarda valores que mudam na tela. `useEffect` roda efeitos, como buscar dados ao carregar." },
-      { type: "block_builder", title: "Monte um contador com blocos", prompt: "Escolha os blocos para montar um contador. Cuidado com os distratores.", palette: ["const [contador, setContador] = useState(0);", "function Contador() {", "  return (", "    <button onClick={() => setContador(contador + 1)}>{contador}</button>", "  );", "}", "useEffect(() => alert('oi'));", "const contador = 0;"], solution: ["function Contador() {", "  const [contador, setContador] = useState(0);", "  return (", "    <button onClick={() => setContador(contador + 1)}>{contador}</button>", "  );", "}"], explanation: "Estado vive dentro do componente; o botão atualiza o estado, que faz a tela renderizar de novo." },
+      { type: "block_builder", title: "Monte um contador com blocos", prompt: "Escolha os blocos para montar um contador. Cuidado com os distratores.", palette: ["  const [contador, setContador] = useState(0);", "function Contador() {", "  return (", "    <button onClick={() => setContador(contador + 1)}>{contador}</button>", "  );", "}", "useEffect(() => alert('oi'));", "const contador = 0;"], solution: ["function Contador() {", "  const [contador, setContador] = useState(0);", "  return (", "    <button onClick={() => setContador(contador + 1)}>{contador}</button>", "  );", "}"], explanation: "Estado vive dentro do componente; o botão atualiza o estado, que faz a tela renderizar de novo." },
       { type: "fill_blank", prompt: "Para guardar e atualizar um contador na tela, qual hook usar?", options: ["useState", "useEffect", "useContext", "useNavigate"], answer: "useState", notes: ["Certo — useState guarda estado.", "Errado — useEffect roda efeitos.", "Errado — useContext compartilha dados.", "Errado — useNavigate navega entre páginas."] },
       { type: "multiple_choice", question: "O array vazio `[]` em useEffect significa:", options: ["Roda uma vez ao montar", "Nunca roda", "Roda a cada tecla", "Causa erro"], correctIndex: 0, notes: ["Certo — roda só na montagem.", "Errado — roda uma vez.", "Errado — só se dependesse da tecla.", "Errado — é padrão válido."] },
     ] },
@@ -369,11 +382,11 @@ export const codeyLessons: Record<number, CodeyLesson[]> = {
   9: [
     { id: "9-1", title: "Fundamentos do Node", xp: 25, exercises: [
       { type: "info", title: "JavaScript fora do navegador", body: "Node.js permite rodar JavaScript no servidor, construir APIs, ler arquivos e conectar bancos." },
-      { type: "wire_match", title: "Navegador x Node", prompt: "Combine cada recurso ao ambiente onde ele vive.", pairs: [
-        { left: "window", right: "Navegador" },
-        { left: "document", right: "Navegador" },
-        { left: "fs (arquivos)", right: "Node.js" },
-        { left: "process.env", right: "Node.js" },
+      { type: "wire_match", title: "Navegador x Node", prompt: "Combine cada recurso com o que ele controla.", pairs: [
+        { left: "window", right: "A janela do navegador" },
+        { left: "document", right: "A página aberta no navegador" },
+        { left: "fs (arquivos)", right: "Arquivos do computador (Node.js)" },
+        { left: "process.env", right: "Configurações do servidor (Node.js)" },
       ], explanation: "JavaScript é a mesma linguagem, mas cada ambiente expõe APIs próprias." },
       { type: "multiple_choice", question: "Diferença principal entre JS no navegador e no Node?", options: ["Ambientes diferentes", "Linguagens diferentes", "Node não aceita funções", "Não existe diferença"], correctIndex: 0, notes: ["Certo — o ambiente muda os recursos disponíveis.", "Errado — é JavaScript nos dois.", "Errado — funções funcionam.", "Errado — há diferenças importantes."] },
       { type: "code_challenge", title: "Simulando uma rota simples", prompt: "Escreva **rotaSaudacao** que recebe `nomeQuery` e retorna `{ mensagem: \"Olá, NOME\" }`.", starterCode: "function rotaSaudacao(nomeQuery) {\n  // escreva seu código aqui\n\n}", hint: "Retorne `{ mensagem: \"Olá, \" + nomeQuery }`.", tests: [{ description: "rotaSaudacao(\"Ana\") retorna objeto correto", expr: "JSON.stringify(rotaSaudacao(\"Ana\")) === JSON.stringify({mensagem:\"Olá, Ana\"})" }] },
@@ -444,6 +457,11 @@ export const codeyLessons: Record<number, CodeyLesson[]> = {
       { type: "info", title: "Tesouro Lendário", body: "Você concluiu a jornada pelas 12 ilhas: HTML, CSS, JavaScript, React, banco, Node, Express, testes e deploy." },
     ] }],
 };
+
+// Oficinas de desafios: uma lição extra por ilha (src/data/codeyChallenges.ts)
+for (const [id, lessons] of Object.entries(challengeLessons)) {
+  codeyLessons[Number(id)] = [...(codeyLessons[Number(id)] ?? []), ...lessons];
+}
 
 export const lessonsForIsland = (islandId: number) => codeyLessons[islandId] || [];
 export const findLesson = (islandId: number, lessonId: string) =>

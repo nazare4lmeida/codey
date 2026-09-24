@@ -86,3 +86,17 @@ Detalhes:
   `supabase/migrations/20260925120000_admin_sem_edge_function.sql` (rodar uma vez no SQL Editor).
   Todas conferem se quem chama é admin. Criar conta usa o cadastro oficial (cliente sem sessão).
   Proteções novas: ninguém tira o próprio admin nem apaga a própria conta pelo painel.
+
+## 7. Oficinas de desafios, formato "Estilize igual ao modelo" e nomes
+
+- **Oficinas**: uma lição nova por ilha (1-4, 2-4, 3-3, 4-4, 5-3 ... 12-3), com 5 atividades dinâmicas
+  cada (60 no total) no tema da ilha. Arquivo: `src/data/codeyChallenges.ts`.
+- **Formato novo `style_match`** (`src/components/codey/StyleMatch.tsx`): a criança escolhe cores e estilos,
+  vê o próprio elemento mudar ao lado do modelo e o CSS sendo escrito. No erro, diz o que ainda está diferente.
+- **`src/test/content.test.ts`** confere TODAS as atividades (lacunas x respostas, labirinto chega ao tesouro,
+  bloco da resposta existe na paleta, pares sem texto repetido, CSS válido...). Ele achou 3 defeitos antigos,
+  corrigidos: 6-2 (bloco sem recuo: impossível de acertar), 9-1 (respostas repetidas: impossível de completar)
+  e 4-1 (solução de referência saía da grade).
+- **Nomes**: contas com nome vazio apareciam como "600f14" no painel e "Programador" no ranking.
+  `supabase/migrations/20260925130000_nomes_no_ranking.sql` preenche com o nome de programador, corrige o ranking
+  e cria um gatilho para os próximos casos. O criador de companheiro também atualiza o nome da conta.
