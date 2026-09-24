@@ -1,7 +1,8 @@
 import { useEffect, useState, useCallback, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
-import { useAuth } from "@/lib/auth-context";
+import { createClient } from "@supabase/supabase-js";
+import { useAuth, friendlyAuthError } from "@/lib/auth-context";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -30,11 +31,68 @@ type AdminUser = {
   user_metadata?: { display_name?: string };
 };
 
-const invoke = async (action: string, payload: Record<string, unknown> = {}) => {
-  const { data, error } = await supabase.functions.invoke("admin-users", { body: { action, ...payload } });
+/**
+ * Operações de usuários do painel.
+ * Antes dependiam da Edge Function "admin-users" (que precisava ser publicada à parte no Supabase).
+ * Agora usam funções SQL (supabase/migrations/20260925120000_admin_sem_edge_function.sql), que já
+ * conferem se quem chama é admin. Criar conta usa o cadastro oficial do Supabase.
+ */
+type Rpc = (fn: string, args?: Record<string, unknown>) => Promise<{ data: unknown; error: { message: string } | null }>;
+const rpc = async (fn: string, args: Record<string, unknown> = {}) => {
+  const { data, error } = await (supabase.rpc as unknown as Rpc)(fn, args);
   if (error) throw new Error(error.message);
-  if ((data as { error?: string })?.error) throw new Error((data as { error: string }).error);
   return data;
+};
+
+// Cliente descartável só para criar contas: não guarda sessão, então quem é admin continua logada.
+const signupClient = () =>
+  createClient(import.meta.env.VITE_SUPABASE_URL, import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY, {
+    auth: { persistSession: false, autoRefreshToken: false, detectSessionInUrl: false, storageKey: "codey-admin-signup" },
+  });
+
+type ListedUser = { id: string; email: string; created_at: string; last_sign_in_at: string | null; display_name: string };
+
+const invoke = async (action: string, payload: Record<string, unknown> = {}) => {
+  switch (action) {
+    case "list": {
+      const rows = ((await rpc("admin_list_users")) as ListedUser[]) ?? [];
+      const users: AdminUser[] = rows.map((r) => ({
+        id: r.id,
+        email: r.email,
+        created_at: r.created_at,
+        last_sign_in_at: r.last_sign_in_at,
+        user_metadata: { display_name: r.display_name },
+      }));
+      return { users };
+    }
+    case "update":
+      await rpc("admin_update_user", {
+        _user_id: payload.userId,
+        _display_name: payload.display_name ?? null,
+        _email: payload.email ?? null,
+        _password: payload.password ?? null,
+      });
+      return { ok: true };
+    case "delete":
+      await rpc("admin_delete_user", { _user_id: payload.userId });
+      return { ok: true };
+    case "set_role":
+      await rpc("admin_set_role", { _user_id: payload.userId, _role: payload.role, _enabled: !!payload.enabled });
+      return { ok: true };
+    case "create": {
+      const { data, error } = await signupClient().auth.signUp({
+        email: String(payload.email),
+        password: String(payload.password),
+        options: { data: { display_name: String(payload.display_name ?? "") } },
+      });
+      if (error) throw new Error(friendlyAuthError(error.message));
+      // Com a confirmação de e-mail ligada, o Supabase não diz se o e-mail já existia: devolve um usuário sem login.
+      if (!data.user || data.user.identities?.length === 0) throw new Error("Esse e-mail já tem conta.");
+      return { user: data.user, needsConfirmation: !data.session };
+    }
+    default:
+      throw new Error(`Ação desconhecida: ${action}`);
+  }
 };
 
 const Admin = () => {
@@ -375,8 +433,10 @@ const CreateUserDialog = ({ onClose, onCreated }: { onClose: () => void; onCreat
     if (!email || password.length < 6) { toast.error("Email e senha (6+) obrigatórios."); return; }
     setSaving(true);
     try {
-      await invoke("create", { email, password, display_name: displayName });
-      toast.success("Usuário criado."); onCreated();
+      const res = (await invoke("create", { email, password, display_name: displayName })) as { needsConfirmation?: boolean };
+      if (res.needsConfirmation) toast.info("Conta criada. Ela só entra depois de confirmar o e-mail (a confirmação ainda está ligada no Supabase).", { duration: 8000 });
+      else toast.success("Usuário criado.");
+      onCreated();
     } catch (e) { toast.error((e as Error).message); }
     finally { setSaving(false); }
   };

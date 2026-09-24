@@ -81,5 +81,8 @@ Detalhes:
   - "Passo a passo" e "Testar primeiro" ficam ocultos (índices 1 e 2 preservados) até existir conteúdo para eles.
 - **Cadastro**: funciona com a confirmação de e-mail ligada ou desligada no Supabase; erros do Supabase
   traduzidos (ex.: "email rate limit exceeded").
-- **Edge Function admin-users**: sem dependência do esm.sh e com CORS definido na própria função.
-  Precisa ser publicada no projeto Supabase: `npx supabase functions deploy admin-users`.
+- **Painel admin sem Edge Function**: a antiga função "admin-users" (que precisava ser publicada à parte
+  no Supabase e causava "Failed to send a request to the Edge Function") foi substituída por funções SQL:
+  `supabase/migrations/20260925120000_admin_sem_edge_function.sql` (rodar uma vez no SQL Editor).
+  Todas conferem se quem chama é admin. Criar conta usa o cadastro oficial (cliente sem sessão).
+  Proteções novas: ninguém tira o próprio admin nem apaga a própria conta pelo painel.
