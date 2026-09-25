@@ -197,7 +197,7 @@ const AdminPanel = ({ adminName, onLogout }: { adminName: string; onLogout: () =
                 <div className="absolute inset-0 bg-secondary/40 blur-2xl rounded-full" />
                 <AnimatedCompanion
                   companion={adminCompanion}
-                  clickClips={["pensando", "assustada"]}
+                  clickClips={["pensando", "assustada", "tonto"]}
                   alt="Lily, sua companheira admin"
                   className="relative w-32 h-32 sm:w-40 sm:h-40 drop-shadow-lg"
                 />

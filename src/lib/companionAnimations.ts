@@ -23,24 +23,32 @@ export const ANIMATIONS: Record<string, CompanionAnimation> = {
     parado: { frames: 22, cols: 8, size: 200, fps: 12, loop: true },
   },
   brasa: {
-    feliz: { frames: 28, cols: 8, size: 200, fps: 12, loop: false },
-    parado: { frames: 24, cols: 8, size: 200, fps: 12, loop: true },
-    calminho: { frames: 18, cols: 8, size: 200, fps: 12, loop: false },
+    parado: { frames: 22, cols: 8, size: 200, fps: 12, loop: true },
+    feliz: { frames: 29, cols: 8, size: 200, fps: 12, loop: false },
+    pensando: { frames: 26, cols: 8, size: 200, fps: 12, loop: false },
+    tonto: { frames: 13, cols: 8, size: 200, fps: 12, loop: false },
+    triste: { frames: 27, cols: 8, size: 200, fps: 12, loop: false },
   },
   nuvi: {
-    feliz: { frames: 28, cols: 8, size: 200, fps: 12, loop: false },
-    parado: { frames: 24, cols: 8, size: 200, fps: 12, loop: true },
-    calminho: { frames: 18, cols: 8, size: 200, fps: 12, loop: false },
+    parado: { frames: 22, cols: 8, size: 200, fps: 12, loop: true },
+    feliz: { frames: 31, cols: 8, size: 200, fps: 12, loop: false },
+    pensando: { frames: 29, cols: 8, size: 200, fps: 12, loop: false },
+    tonto: { frames: 15, cols: 8, size: 200, fps: 12, loop: false },
+    triste: { frames: 27, cols: 8, size: 200, fps: 12, loop: false },
   },
   musgo: {
-    feliz: { frames: 28, cols: 8, size: 200, fps: 12, loop: false },
-    parado: { frames: 24, cols: 8, size: 200, fps: 12, loop: true },
-    calminho: { frames: 18, cols: 8, size: 200, fps: 12, loop: false },
+    parado: { frames: 22, cols: 8, size: 200, fps: 12, loop: true },
+    feliz: { frames: 29, cols: 8, size: 200, fps: 12, loop: false },
+    pensando: { frames: 26, cols: 8, size: 200, fps: 12, loop: false },
+    tonto: { frames: 12, cols: 8, size: 200, fps: 12, loop: false },
+    triste: { frames: 27, cols: 8, size: 200, fps: 12, loop: false },
   },
   marola: {
-    feliz: { frames: 28, cols: 8, size: 200, fps: 12, loop: false },
-    parado: { frames: 24, cols: 8, size: 200, fps: 12, loop: true },
-    calminho: { frames: 18, cols: 8, size: 200, fps: 12, loop: false },
+    parado: { frames: 22, cols: 8, size: 200, fps: 12, loop: true },
+    feliz: { frames: 29, cols: 8, size: 200, fps: 12, loop: false },
+    pensando: { frames: 26, cols: 8, size: 200, fps: 12, loop: false },
+    tonto: { frames: 13, cols: 8, size: 200, fps: 12, loop: false },
+    triste: { frames: 27, cols: 8, size: 200, fps: 12, loop: false },
   },
   astro: {
     feliz: { frames: 28, cols: 8, size: 200, fps: 12, loop: false },
@@ -48,12 +56,13 @@ export const ANIMATIONS: Record<string, CompanionAnimation> = {
     calminho: { frames: 18, cols: 8, size: 200, fps: 12, loop: false },
   },
   // Lily: companheira exclusiva do painel admin (não aparece na escolha da criança).
-  // parado = trecho "feliz" do vídeo em vai-e-volta; ao clicar alterna pensando/assustada; triste fica guardada.
+  // parado = trecho "feliz" do vídeo em vai-e-volta; ao clicar alterna pensando/assustada/tonto; triste fica guardada.
   lily: {
     parado: { frames: 54, cols: 8, size: 200, fps: 12, loop: true },
     pensando: { frames: 18, cols: 8, size: 200, fps: 12, loop: false },
     assustada: { frames: 20, cols: 8, size: 200, fps: 12, loop: false },
     triste: { frames: 56, cols: 8, size: 200, fps: 12, loop: false },
+    tonto: { frames: 15, cols: 8, size: 200, fps: 12, loop: false },
   },
 };
 

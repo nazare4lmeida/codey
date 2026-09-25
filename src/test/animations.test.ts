@@ -6,6 +6,7 @@ import { onCompanionReaction, reactCompanion } from "@/lib/companion-reaction";
 describe("escolha da emoção", () => {
   const vix = ANIMATIONS.vix;
   const brasa = ANIMATIONS.brasa;
+  const astro = ANIMATIONS.astro; // único ainda sem "pensando"/"tonto" (usa calminho)
 
   it("acerto e fim de lição → feliz", () => {
     expect(pickClip(vix, "acerto")).toBe("feliz");
@@ -14,17 +15,26 @@ describe("escolha da emoção", () => {
 
   it("erro → pensando; sem pensando, cai para calminho", () => {
     expect(pickClip(vix, "erro")).toBe("pensando");
-    expect(pickClip(brasa, "erro")).toBe("calminho");
+    expect(pickClip(brasa, "erro")).toBe("pensando");
+    expect(pickClip(astro, "erro")).toBe("calminho");
   });
 
   it("2º erro seguido → tonto; sem tonto, reação de erro normal", () => {
     expect(pickClip(vix, "erro-seguido")).toBe("tonto");
-    expect(pickClip(brasa, "erro-seguido")).toBe("calminho");
+    expect(pickClip(brasa, "erro-seguido")).toBe("tonto");
+    expect(pickClip(astro, "erro-seguido")).toBe("calminho");
   });
 
   it("'triste' nunca é escolhido automaticamente", () => {
     for (const anim of Object.values(ANIMATIONS))
       for (const r of ["acerto", "erro", "erro-seguido", "fim"] as const) expect(pickClip(anim, r)).not.toBe("triste");
+  });
+});
+
+describe("conjunto completo", () => {
+  it("Vix, Brasa, Nuvi, Musgo e Marola têm as 5 emoções", () => {
+    for (const id of ["vix", "brasa", "nuvi", "musgo", "marola"])
+      for (const e of ["parado", "feliz", "pensando", "tonto", "triste"] as const) expect(ANIMATIONS[id][e], `${id}-${e}`).toBeTruthy();
   });
 });
 

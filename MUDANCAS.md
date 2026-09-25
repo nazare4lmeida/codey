@@ -100,3 +100,9 @@ Detalhes:
 - **Nomes**: contas com nome vazio apareciam como "600f14" no painel e "Programador" no ranking.
   `supabase/migrations/20260925130000_nomes_no_ranking.sql` preenche com o nome de programador, corrige o ranking
   e cria um gatilho para os próximos casos. O criador de companheiro também atualiza o nome da conta.
+
+## 8. Emoções completas para Nuvi, Musgo, Marola e Brasa
+
+Recortadas dos vídeos `nuvi_e_lily.mp4` e `marolabrasaemusgo.mp4` (fundo removido quadro a quadro).
+Os quatro agora têm parado, feliz, pensando, tonto e triste, como a Vix. O antigo "calminho" deles foi
+substituído por "pensando" (continua só no Astro). A Lily ganhou o "tonto", que entra no ciclo do toque no painel.
